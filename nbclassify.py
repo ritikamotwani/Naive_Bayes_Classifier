@@ -5,16 +5,32 @@ import re
 import json 
 import math
 
+#SuperDict
+superDict = {}
+
 #File Loc
 trainTextFileLoc = argv[1]
 
-#Raw file input
-corpus = [re.sub(r'[^\w\s]','',line.rstrip('\n')).lower().split(' ', 1)[1] for line in open(trainTextFileLoc)]
+#Generation of raw text and the uids
+corpus = []
+uuids = []
 
+for line in open(trainTextFileLoc):
+    temp = line.split(' ',1)
+    corpus.append(re.sub(r'[^\w\s]','',temp[1].strip()).lower())
+    uuids.append(temp[0].strip())
+
+#retrieve the model from nbmodel.txt
 model = {}
-with open('nbmodel.txt', 'r') as fp:
-    model = json.load(fp)
+priors = {}
 
+with open('nbmodel.txt', 'r') as fp:
+    superDict = json.load(fp)
+
+priors = superDict['priors']
+model = superDict['conditionals']    
+
+#Calculating the final results
 resultDict1 = []
 resultDict2 = []
 for entry in corpus:
@@ -30,6 +46,11 @@ for entry in corpus:
             logProbPositive += math.log(model[word]['positive'])
             logProbNegative += math.log(model[word]['negative'])
             
+    logProbTruthful += math.log(priors['truthful'])
+    logProbDeceptive += math.log(priors['deceptive'])
+    logProbPositive += math.log(priors['positive'])
+    logProbNegative += math.log(priors['negative'])
+    
     if logProbTruthful > logProbDeceptive:
         resultDict1.append('truthful')
     else:
@@ -39,5 +60,8 @@ for entry in corpus:
         resultDict2.append('positive')
     else:
         resultDict2.append('negative')
-            
-print 'Done'
+        
+#Printing the resultsto nboutput.txt    
+with open('nboutput.txt', 'w') as fp:
+    for count in range(len(uuids)):
+        fp.write(uuids[count] + ' ' + resultDict1[count] + ' ' + resultDict2[count] + '\n' )
