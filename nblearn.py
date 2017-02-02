@@ -47,13 +47,33 @@ def buildBagofWordsModel(corpus):
     
 #Generate model for each class    
 def buildModelForClass(model,classCorpus,classLabel):
+
+    stopWords = ["", "-", "!", ",", ".", ":"," "
+                   "a", "able", "about", "all", "also", "am", "an", "and", "any", "as", "are", "at",
+                   "be", "but", "by",
+                   "can",
+                   "did", "do"
+                          "etc",
+                   "find", "for", "from",
+                   "get", "go",
+                   "have", "had", "he", "her", "him", "how",
+                   "i", "if", "in", "is", "it", "its",
+                   "me", "my",
+                   "of", "on", "or", "our",
+                   "so",
+                   "than", "that", "the", "their", "there", "these", "they", "things", "this", "to", "too",
+                   "you", "youll", "your",
+                   "us", "up",
+                   "was", "want", "we", "were", "what", "when", "where", "which", "whom", "why", "will", "with", "who"]    
+    
     wordcount = 0
     for entry in classCorpus:
         words = entry.split(' ')
         for word in words:
-            word = word.strip()
-            model[word][classLabel] += 1
-            wordcount += 1
+            if word not in stopWords:
+                word = word.strip()
+                model[word][classLabel] += 1
+                wordcount += 1
      
     for key in model:
         model[key][classLabel] = (model[key][classLabel] + 1.0)/(wordcount + len(model))
@@ -67,7 +87,7 @@ trainTextFileLoc = argv[1]
 trainLabelFileLoc = argv[2]
 
 #Raw file input
-corpus = [re.sub(r'[^\w\s]','',line.rstrip('\n')).lower().split(' ', 1)[1] for line in open(trainTextFileLoc)]
+corpus = [re.sub(r'[^\w\s]',' ',line.rstrip('\n')).lower().split(' ', 1)[1] for line in open(trainTextFileLoc)]
 trainLabel = [line.rstrip('\n') for line in open(trainLabelFileLoc)]
 
 #List of labels

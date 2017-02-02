@@ -8,6 +8,26 @@ import math
 #SuperDict
 superDict = {}
 
+#Stopwords
+stopWords = ["", "-", "!", ",", ".", ":"," "
+                   "a", "able", "about", "all", "also", "am", "an", "and", "any", "as", "are", "at",
+                   "be", "but", "by",
+                   "can",
+                   "did", "do"
+                          "etc",
+                   "find", "for", "from",
+                   "get", "go",
+                   "have", "had", "he", "her", "him", "how",
+                   "i", "if", "in", "is", "it", "its",
+                   "me", "my",
+                   "of", "on", "or", "our",
+                   "so",
+                   "than", "that", "the", "their", "there", "these", "they", "things", "this", "to", "too",
+                   "you", "youll", "your",
+                   "us", "up",
+                   "was", "want", "we", "were", "what", "when", "where", "which", "whom", "why", "will", "with", "who"]
+
+
 #File Loc
 trainTextFileLoc = argv[1]
 
@@ -17,7 +37,7 @@ uuids = []
 
 for line in open(trainTextFileLoc):
     temp = line.split(' ',1)
-    corpus.append(re.sub(r'[^\w\s]','',temp[1].strip()).lower())
+    corpus.append(re.sub(r'[^\w\s]',' ',temp[1].strip()).lower())
     uuids.append(temp[0].strip())
 
 #retrieve the model from nbmodel.txt
@@ -40,7 +60,7 @@ for entry in corpus:
     logProbNegative = 0
     words = entry.split(' ')
     for word in words:
-        if word in model:
+        if word in model and word not in stopWords:
             logProbTruthful += math.log(model[word]['truthful'])
             logProbDeceptive += math.log(model[word]['deceptive'])
             logProbPositive += math.log(model[word]['positive'])
